@@ -33,7 +33,6 @@ class AdicionarAoCarrinho(View):
         variacao_nome = variacao.nome or ''
         preco_unitario = variacao.preco
         preco_unitario_promocional = variacao.preco_promocional
-        quantidade = 1
         slug = produto.slug
         imagem = produto.imagem
 
@@ -78,6 +77,7 @@ class AdicionarAoCarrinho(View):
                 'imagem': imagem,
             }
         self.request.session.save()
+        return redirect(http_referer)
 
 class RemoverDoCarrinho(View):
     def get(self, *args, **kwargs):
@@ -97,7 +97,7 @@ class RemoverDoCarrinho(View):
 
         messages.success(self.request, f'Produto {carrinho['produto_nome']} {carrinho['variacao_nome']} removido do seu carrinho')
 
-        del carrinho
+        del self.request.session['carrinho'][variacao_id]
         self.request.session.save()
         return redirect(http_referer)
 
@@ -108,5 +108,5 @@ class Carrinho(View):
         }
         return render(self.request, 'produto/carrinho.html', contexto)
 
-class Finalizar(View):
+class ResumoDaCompra(View):
     ...
