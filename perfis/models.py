@@ -2,11 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 import re
-from utils import validacpf
+from utils.validacpf import valida_cpf as validacpf
 
 
 class Perfil(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     idade = models.PositiveIntegerField()
     data_nascimento = models.DateField()
     cpf = models.CharField(max_length=11, help_text='Não digite pontos nem traços.')
@@ -47,7 +47,7 @@ class Perfil(models.Model):
     ))
 
     def __str__(self):
-        return self.user
+        return 'oi'
     
     def clean(self):
         error_messages = {}

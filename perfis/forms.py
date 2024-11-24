@@ -6,7 +6,7 @@ class PerfilForm(forms.ModelForm):
     class Meta:
         model = models.Perfil
         fields = '__all__'
-        exclude = ('usuario',)
+        exclude = ('user','usuario')
 
 class UserForm(forms.ModelForm):
 
@@ -20,6 +20,8 @@ class UserForm(forms.ModelForm):
 
     def __init__(self, usuario=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.usuario = usuario
 
     class Meta:
         model = User

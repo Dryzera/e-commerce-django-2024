@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView
 from django.views import View
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -45,18 +44,20 @@ class BasePerfil(View):
 class Criar(BasePerfil):
     def post(self, *args, **kwargs):
         if not self.userform.is_valid() or not self.perfilform.is_valid():
+            messages.error(self.request, 'Existem erros no formulário de cadastro abaixo.')
             return self.renderizar
         
         username = self.userform.cleaned_data.get('username')
         password = self.userform.cleaned_data.get('password')
         email = self.userform.cleaned_data.get('email')
-        first_name = self.userform.cleaned_data.get('fisrt_name')
+        first_name = self.userform.cleaned_data.get('first_name')
         last_name = self.userform.cleaned_data.get('last_name')
 
 
         if self.request.user.is_authenticated:
             usuario = get_object_or_404(User, username=self.request.user.username)
             usuario.username = username
+            print(usuario, username)
             
             if password:
                 usuario.set_password(password)
@@ -67,11 +68,11 @@ class Criar(BasePerfil):
             usuario.save()
 
             if not self.perfil:
-                self.perfilform.clened_data['usuario'] = usuario
+                self.perfilform.cleaned_data['usuario'] = usuario
                 perfil = models.Perfil(**self.perfilform.cleaned_data)
                 perfil.save()
             else:
-                self.perfilform.save(commit=False)
+                perfil = self.perfilform.save(commit=False)
                 perfil.usuario = usuario
                 perfil.save()
 
@@ -119,6 +120,7 @@ class Login(View):
         login(self.request, user=autentica)
 
         messages.success(self.request, 'Você fez login!')
+        return redirect('perfil:criar')
 
 class Logout(View):
     def get(self, *args, **kwargs):
