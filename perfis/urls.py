@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from . import views
 
-app_name = 'perfis'
+app_name = 'perfil'
 
 urlpatterns = [
     path('', views.Criar.as_view(), name='criar'),

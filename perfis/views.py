@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView
 from django.views import View
 from django.contrib.auth.models import User
+from django.contrib import messages
 import copy
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from . import models
 from . import forms
 
@@ -92,13 +93,37 @@ class Criar(BasePerfil):
         self.request.session['carrinho'] = self.carrinho
         self.request.session.save()
 
-        return self.renderizar
+        messages.success(self.request, 'Seu cadastro foi efetuado com sucesso!')
+        messages.success(self.request, 'Você fez login.')
+
+        return redirect('perfil:criar')
 
 class Atualizar(View):
     ...
 
 class Login(View):
-    ...
+    def post(self, *args, **kwargs):
+        username = self.request.POST.get('username')
+        password = self.request.POST.get('password')
+
+        if not username or not password:
+            messages.error(self.request, 'Usuário ou senha inválidos.')
+
+            return redirect('perfil:criar')
+
+        autentica = authenticate(self.request, username=username, password=password)
+
+        if not autentica:
+            messages.error(self.request, 'Usuário ou senha inválidos.')
+
+        login(self.request, user=autentica)
+
+        messages.success(self.request, 'Você fez login!')
 
 class Logout(View):
-    ...
+    def get(self, *args, **kwargs):
+        carrinho = copy.deepcopy(self.request.session.get('carrinho'))
+        logout(self.request)
+        self.request.session['carrinho'] = carrinho
+        self.request.session.save()
+        return redirect('produto:lista')
