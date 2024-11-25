@@ -6,6 +6,7 @@
     <div class="col-lg">
         <h2>Resumo da sua compra</h2>
 
+        {% for dados in perfil %}
         <p class="lead">Dados do usuário</p>
         <p>Caso precise editar, <a href="{% url "perfil:criar" %}">clique aqui</a></p>
         <dl class="row">
@@ -15,12 +16,12 @@
             <dd class="col-lg-4">{{ usuario.last_name }}</dd>
 
             <dt class="col-lg-2">Idade:</dt>
-            <dd class="col-lg-4">{{ usuario.perfis.idade }}</dd>
+            <dd class="col-lg-4">{{ dados.idade }}</dd>
             <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">{{ usuario.perfis.data_nascimento }}</dd>
+            <dd class="col-lg-4">{{ dados.data_nascimento }}</dd>
 
             <dt class="col-lg-2">CPF:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cpf }}</dd>
+            <dd class="col-lg-4">{{ dados.cpf }}</dd>
             <dt class="col-lg-2">E-mail:</dt>
             <dd class="col-lg-4">{{ usuario.email }}</dd>
         </dl>
@@ -29,23 +30,24 @@
         <p>Caso precise editar, <a href="{% url "perfil:criar" %}">clique aqui</a></p>
         <dl class="row">
             <dt class="col-lg-2">Endereço:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.endereco }}</dd>
+            <dd class="col-lg-4">{{ dados.endereco }}</dd>
             <dt class="col-lg-2">Número:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.numero }}</dd>
+            <dd class="col-lg-4">{{ dados.numero }}</dd>
 
             <dt class="col-lg-2">Complemento:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.complemento }}</dd>
+            <dd class="col-lg-4">{{ dados.complemento }}</dd>
             <dt class="col-lg-2">Bairro:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.bairro }}</dd>
+            <dd class="col-lg-4">{{ dados.bairro }}</dd>
 
             <dt class="col-lg-2">Cidade:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cidade }}</dd>
+            <dd class="col-lg-4">{{ dados.cidade }}</dd>
             <dt class="col-lg-2">Estado:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.estado }}</dd>
+            <dd class="col-lg-4">{{ dados.estado }}</dd>
 
             <dt class="col-lg-2">CEP:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cep }}</dd>
+            <dd class="col-lg-4">{{ dados.cep }}</dd>
         </dl>
+        {% endfor %}
     </div>
 </div>
 
