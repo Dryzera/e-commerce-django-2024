@@ -7,6 +7,10 @@ from produtos.models import Variacao
 from .models import Pedido, ItemPedido
 
 class Pagar(View):
+    ...
+        
+
+class SalvarPedido(View):
     template_name = 'pedido/pagar.html'
     
     def get(self, *args, **kwargs):
@@ -75,10 +79,6 @@ class Pagar(View):
         del self.request.session['carrinho']
 
         return redirect('pedido:lista')
-        
-
-class SalvarPedido(View):
-    ...
 
 class Detalhe(View):
     ...
