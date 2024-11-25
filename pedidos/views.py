@@ -15,7 +15,7 @@ class DispatchLoginRequiredMixin(View):
     
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(usuario=self.request.user)
+        qs = qs.filter(user=self.request.user)
         return qs
 
 class Pagar(DispatchLoginRequiredMixin, DetailView):
@@ -50,14 +50,17 @@ class SalvarPedido(View):
             preco_unt = carrinho[vid]['preco_unitario']
             preco_unt_promo = carrinho[vid]['preco_unitario_promocional']
 
-            error_msg_estoque = 'Estoque insufiente para alguns produtos do seu carrinho. Reduzimos a quantidade desses produtos, por favor verifique no resumo da compra.'
+            error_msg_estoque = ''
 
             if estoque < qtd_carrinho:
                 carrinho[vid]['quantidade'] = estoque
                 carrinho[vid]['preco_quantitativo'] = estoque * preco_unt
                 carrinho[vid]['preco_quantitativo_promocional'] = estoque * preco_unt_promo
-            
-            if not error_msg_estoque:
+
+                error_msg_estoque = 'Estoque insufiente para alguns produtos do seu carrinho. Reduzimos a quantidade desses produtos, por favor verifique no resumo da compra.'
+    
+        
+            if error_msg_estoque:
                 messages.error(self.request, error_msg_estoque)
 
                 self.request.session.save()
