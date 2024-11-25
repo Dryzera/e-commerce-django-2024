@@ -6,23 +6,23 @@ from utils import utils
 from produtos.models import Variacao
 from .models import Pedido, ItemPedido
 
-class DispatchLoginRequired(View):
+class DispatchLoginRequiredMixin(View):
     def dispatch(self,*args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
         
         return super().dispatch(*args, **kwargs)
-
-class Pagar(DispatchLoginRequired, DetailView):
-    template_name = 'pedido/pagar.html'
-    model = Pedido
-    pk_url_kwarg = 'pk'
-    context_object_name = 'pedido'
-
+    
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.filter(usuario=self.request.user)
         return qs
+
+class Pagar(DispatchLoginRequiredMixin, DetailView):
+    template_name = 'pedido/pagar.html'
+    model = Pedido
+    pk_url_kwarg = 'pk'
+    context_object_name = 'pedido'
 
 
 class SalvarPedido(View):
@@ -40,7 +40,7 @@ class SalvarPedido(View):
 
         carrinho = self.request.session.get('carrinho')
         carrinho_variacao_ids = [v for v in carrinho]
-        bd_variacoes = list(Variacao.objects.select_related('produto').filter(if__in=carrinho_variacao_ids))
+        bd_variacoes = list(Variacao.objects.select_related('produto').filter(id__in=carrinho_variacao_ids))
 
         for variacao in bd_variacoes:
             vid = str(variacao.id)
@@ -50,24 +50,23 @@ class SalvarPedido(View):
             preco_unt = carrinho[vid]['preco_unitario']
             preco_unt_promo = carrinho[vid]['preco_unitario_promocional']
 
-            error_msg_estoque = 'Estoque insufiente para alguns produtos do seu carrinho. ' \
-                               'Reduzimos a quantidade desses produtos, por favor verifique no resumo da compra.'
+            error_msg_estoque = 'Estoque insufiente para alguns produtos do seu carrinho. Reduzimos a quantidade desses produtos, por favor verifique no resumo da compra.'
 
             if estoque < qtd_carrinho:
                 carrinho[vid]['quantidade'] = estoque
                 carrinho[vid]['preco_quantitativo'] = estoque * preco_unt
                 carrinho[vid]['preco_quantitativo_promocional'] = estoque * preco_unt_promo
             
-            if error_msg_estoque:
+            if not error_msg_estoque:
                 messages.error(self.request, error_msg_estoque)
 
                 self.request.session.save()
                 return redirect('produto:carrinho')
             
         quantidade_total = utils.cart_total_qtd(carrinho)
-        valor_total = utils.cart_total(carrinho)
+        valor_total = utils.cart_totals(carrinho)
 
-        pedido = Pedido(usuario=self.request.user, total=valor_total, qtd_total=quantidade_total, status='C')
+        pedido = Pedido(user=self.request.user, total=valor_total, qtd_total=quantidade_total, status='C')
         pedido.save()
 
         ItemPedido.objects.bulk_create(
@@ -96,8 +95,15 @@ class SalvarPedido(View):
             'pedido:pagar', kwargs={'pk': pedido.pk}
         ))
 
-class Detalhe(View):
-    ...
+class Detalhe(DispatchLoginRequiredMixin, View):
+    model = Pedido
+    context_object_name = 'pedido'
+    template_name = 'pedido/detalhe.html'
+    pk_url_kwarg = 'pk'
     
-class Lista():
-    ...
+class Lista(DispatchLoginRequiredMixin, ListView):
+    model = Pedido
+    context_object_name = 'pedidos'
+    template_name = 'pedido/lista.html'
+    paginate_by = 10
+    ordering = ['-id']
